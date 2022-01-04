@@ -232,7 +232,7 @@ def create_venue_submission():
 
     if form.validate():
       print("validated")
-      # define venue from entered data and add it to db
+      # define new venue instance and insert to db
       venue = Venue(name=name, city=city, state=state, address=address,
                   phone=phone, genres=genres, facebook_link=facebook_link,
                   website=website, image_link=image_link,
