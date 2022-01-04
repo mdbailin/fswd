@@ -181,13 +181,13 @@ def show_venue(venue_id):
     "city": venue.city,
     "state": venue.state,
     "phone": venue.phone,
-    "website": venue.website,
+    "website_link": venue.website_link,
     "facebook_link": venue.facebook_link,
     "seeking_talent": venue.seeking_talent,
     "seeking_description": venue.seeking_description,
     "image_link": venue.image_link,
-    "past_shows": venue.past_shows,
-    "upcoming_shows": venue.upcoming_shows,
+    "past_shows": previous_shows,
+    "upcoming_shows": next_shows,
     "past_shows_count": len(previous_shows),
     "upcoming_shows_count": len(next_shows)
   }
@@ -216,7 +216,7 @@ def create_venue_submission():
     phone = form.phone.data
     genres = form.genres.data
     facebook_link = form.facebook_link.data
-    website = form.website.data
+    website_link = form.website_link.data
     image_link = form.image_link.data
 
     seeking_talent = False
@@ -230,7 +230,7 @@ def create_venue_submission():
       # define new venue instance and append to db
       venue = Venue(name=name, city=city, state=state, address=address,
                   phone=phone, genres=genres, facebook_link=facebook_link,
-                  website=website, image_link=image_link,
+                  website_link=website_link, image_link=image_link,
                   seeking_talent=seeking_talent,
                   seeking_description=seeking_description)
       db.session.add(venue)
@@ -243,12 +243,13 @@ def create_venue_submission():
       flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')     
       flash_errors(form)
 
-  except:
+  except ValueError as e:
     # TODO: on unsuccessful db insert, flash an error instead.
     # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
     # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
     flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
     db.session.rollback()
+    print(e)
   finally:
     db.session.close()
 
@@ -324,7 +325,7 @@ def show_artist(artist_id):
     "city": artist.city,
     "state": artist.state,
     "phone": artist.phone,
-    "website": artist.website,
+    "website_link": artist.website_link,
     "facebook_link": artist.facebook_link,
     "seeking_venue": artist.seeking_venue,
     "seeking_description": artist.seeking_description,
@@ -349,7 +350,7 @@ def edit_artist(artist_id):
     "city": artist.city,
     "state": artist.state,
     "phone": artist.phone,
-    "website": artist.website,
+    "website_link": artist.website_link,
     "facebook_link": artist.facebook_link,
     "seeking_venue": artist.seeking_venue,
     "seeking_description": artist.seeking_description,
@@ -375,7 +376,7 @@ def edit_artist_submission(artist_id):
     artist.phone = form.phone.data
     artist.genres = form.genres.data
     artist.facebook_link = form.facebook_link.data
-    artist.website = form.website.data
+    artist.website_link = form.website_link.data
     artist.image_link = form.image_link.data
 
     artist.seeking_venue = False
@@ -388,7 +389,7 @@ def edit_artist_submission(artist_id):
       #define newly edited artist instance and insert into db
       artist = Artist(name=artist.name, city=artist.city, state=artist.state,
                       phone=artist.phone, genres=artist.genres, facebook_link=artist.facebook_link,
-                      website=artist.website, image_link=artist.image_link,
+                      website_link=artist.website_link, image_link=artist.image_link,
                       seeking_venue=artist.seeking_venue, seeking_description=artist.seeking_description)
       db.session.commit()
       flash('Artist ' + request.form['name'] + ' was successfully updated.')
@@ -420,7 +421,7 @@ def edit_venue(venue_id):
     "city": venue.city,
     "state": venue.state,
     "phone": venue.phone,
-    "website": venue.website,
+    "website_link": venue.website_link,
     "facebook_link": venue.facebook_link,
     "seeking_talent": venue.seeking_talent,
     "seeking_description": venue.seeking_description,
@@ -447,7 +448,7 @@ def edit_venue_submission(venue_id):
     venue.phone = form.phone.data
     venue.genres = form.genres.data
     venue.facebook_link = form.facebook_link.data
-    venue.website = form.website.data
+    venue.website_link = form.website_link.data
     venue.image_link = form.image_link.data
 
     venue.seeking_talent = False
@@ -459,7 +460,7 @@ def edit_venue_submission(venue_id):
       #define new venue instance and insert into db
       venue = Venue(name=venue.name, city=venue.city, state=venue.state,
                     address=venue.address, phone=venue.phone, genres=venue.genres,
-                    facebook_link=venue.facebook_link, website=venue.website,
+                    facebook_link=venue.facebook_link, website_link=venue.website_link,
                     image_link=venue.image_link, seeking_talent=venue.seeking_talent,
                     seeking_description=venue.seeking_description)
       db.session.commit()
@@ -501,7 +502,7 @@ def create_artist_submission():
     phone = form.phone.data
     genres = form.genres.data
     facebook_link = form.facebook_link.data
-    website = form.website.data
+    website_link = form.website_link.data
     image_link = form.image_link.data
 
     seeking_venue = False
@@ -514,7 +515,7 @@ def create_artist_submission():
       # define new artist instance and insert to db
       artist = Artist(name=name, city=city, state=state,
                     phone=phone, genres=genres, facebook_link=facebook_link,
-                    website=website, image_link=image_link,
+                    website_link=website_link, image_link=image_link,
                     seeking_venue=seeking_venue,
                     seeking_description=seeking_description)
       db.session.add(artist)
