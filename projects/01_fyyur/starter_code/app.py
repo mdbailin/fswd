@@ -226,6 +226,7 @@ def create_venue_submission():
     seeking_description = form.seeking_description.data
 
     if form.validate():
+      print("validated")
       # define new venue instance and append to db
       venue = Venue(name=name, city=city, state=state, address=address,
                   phone=phone, genres=genres, facebook_link=facebook_link,
@@ -238,6 +239,7 @@ def create_venue_submission():
       # TODO:Done on successful db insert, flash success
       flash('Venue ' + request.form['name'] + ' was successfully listed!')
     else:
+      print("failed")
       flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')     
       flash_errors(form)
 
