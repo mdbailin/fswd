@@ -169,9 +169,28 @@ def show_venue(venue_id):
   #SOLVED: query venue and shows by venue id, then populate data
 
   venue = Venue.query.filter_by(id=venue_id).first()
-  shows = Show.query.filter_by(venue_id=venue_id).all()
-  previous_shows = past_shows(shows)
-  next_shows = upcoming_shows(shows)
+  past_shows = (
+    db.session.query(Artist, Show)
+    .join(Show)
+    .join(Venue)
+    .filter(
+      Show.venue_id == venue_id,
+      Show.artist_id == Artist.id,
+      Show.start_time < datetime.now()
+    )
+    .all()
+  )
+  upcoming_shows = (
+    db.session.query(Artist, Show)
+    .join(Show)
+    .join(Venue)
+    .filter(
+      Show.venue_id == venue_id,
+      Show.artist_id == Artist.id,
+      Show.start_time >= datetime.now()
+    )
+    .all()
+  )
 
   data={
     "id": venue.id,
@@ -186,10 +205,26 @@ def show_venue(venue_id):
     "seeking_talent": venue.seeking_talent,
     "seeking_description": venue.seeking_description,
     "image_link": venue.image_link,
-    "past_shows": previous_shows,
-    "upcoming_shows": next_shows,
-    "past_shows_count": len(previous_shows),
-    "upcoming_shows_count": len(next_shows)
+    "past_shows": [
+      {
+        "id": artist.id,
+        "name": artist.name,
+        "image_link": artist.image_link,
+        "start_time": show.start_time.strftime("%m/%d/%Y, %H:%M")
+      }
+      for artist, show in past_shows
+    ],
+    "upcoming_shows": [
+      {
+        "id": artist.id,
+        "name": artist.name,
+        "image_link": artist.image_link,
+        "start_time": show.start_time.strftime("%m/%d/%Y, %H:%M")
+      }
+      for artist, show in upcoming_shows
+    ],
+    "past_shows_count": len(past_shows),
+    "upcoming_shows_count": len(upcoming_shows)
   }
   return render_template('pages/show_venue.html', venue=data)
 
