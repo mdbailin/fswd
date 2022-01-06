@@ -21,7 +21,7 @@ class Venue(db.Model):
     genres = db.Column(db.ARRAY(db.String), nullable=False)
     seeking_talent = db.Column(db.Boolean, nullable=True, default=False)
     seeking_description = db.Column(db.String(120))
-    shows = db.relationship('Show', backref=db.backref('venue'), lazy = 'joined')
+    shows = db.relationship('Show', backref=db.backref('venue'), lazy = True, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<venue {self.id} {self.name}'
@@ -37,14 +37,14 @@ class Artist(db.Model):
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     phone = db.Column(db.String(120))
-    genres = db.Column(db.String(120))
+    genres = db.Column(db.ARRAY(db.String), nullable=False)
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
     website_link = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean, nullable=True, default=False)
     seeking_description = db.Column(db.String(1000))
-    shows = db.relationship('Show', backref=db.backref('artist'), lazy='joined')
+    shows = db.relationship('Show', backref=db.backref('artist'), lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):
         return '<Artist {}>'.format(self.name)

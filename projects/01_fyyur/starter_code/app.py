@@ -296,7 +296,8 @@ def delete_venue(venue_id):
   # TODO: Complete this endpoint for taking a venue_id, and using
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
   try:
-    venue = Venue.query.get(venue_id)
+    venue = Venue.query.filter(id=venue_id).first()
+    print(venue)
     venue_name = venue.name
     db.session.delete(venue)
     db.session.commit()
@@ -307,7 +308,7 @@ def delete_venue(venue_id):
   finally:
     db.session.close()
   
-  return jsonify({'success': True})
+  return redirect(url_for("index"))
 
 
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
@@ -348,10 +349,24 @@ def search_artists():
 def show_artist(artist_id):
   # shows the artist page with the given artist_id
   # TODO: replace with real artist data from the artist table, using artist_id
-  artist = Artist.query.filter_by(id=artist_id).first()
-  shows = Show.query.filter_by(artist_id=artist_id).all()
-  previous_shows = past_shows(shows)
-  next_shows = upcoming_shows(shows)
+  past_shows = []
+  upcoming_shows = []
+  
+  artist = db.session.query(Artist).filter_by(id=artist_id).first()
+  result = db.session.query(Show, Venue).join(Venue, Venue.id == Show.venue_id).filter(Show.artist_id == artist.id).all()
+
+  for show, venue in result:
+    temp_show = {
+      "id": artist.id,
+      "name": artist.name,
+      "image_link": venue.image_link,
+      "start_time": show.start_time.strftime("%m/%d/%Y, %H:%M")
+    }
+    if show.start_time <= datetime.now():
+      past_shows.append(temp_show)
+    else:
+      upcoming_shows.append(temp_show)
+
 
   data={
     "id": artist.id,
@@ -365,11 +380,11 @@ def show_artist(artist_id):
     "seeking_venue": artist.seeking_venue,
     "seeking_description": artist.seeking_description,
     "image_link": artist.image_link,
-    "past_shows": previous_shows,
-    "upcoming_shows": next_shows,
-    "past_show_count": len(previous_shows),
-    "upcoming_show_count": len(next_shows)
-  }
+    "past_shows": past_shows,
+    "upcoming_shows": upcoming_shows,
+    "past_shows_count": len(past_shows),
+    "upcoming_shows_count": len(upcoming_shows)
+    }
   return render_template('pages/show_artist.html', artist=data)
 
 #  Update
@@ -381,7 +396,7 @@ def edit_artist(artist_id):
   edit_artist={
     "id": artist.id,
     "name": artist.name,
-    "genres": artist.genre,
+    "genres": artist.genres,
     "city": artist.city,
     "state": artist.state,
     "phone": artist.phone,
