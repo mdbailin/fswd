@@ -12,8 +12,25 @@
 					<h5>{{ venue.name }}</h5>
 				</div>
 			</a>
+	<button id = "delete_button" class="btn btn-primary" data-id = "{{venue.id}}"> DELETE </button>
 		</li>
 		{% endfor %}
 	</ul>
+	<script>
+		const delete_button = document.getElementById('delete_button');
+		delete_button.onclick = function (e) {
+			const venue_id = e.target.dataset['id'];
+			fetch('/venues/' + venue_id, {
+				method: "DELETE"
+			})
+			.then(function() {
+				window.location.href = '/venues';
+			})
+			.catch(function(e) {
+				console.log('error', e)
+			})
+		}
+	</script>
+	{# need to implement delete script separately #}
 {% endfor %}
 {% endblock %}
